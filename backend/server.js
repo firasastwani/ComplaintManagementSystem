@@ -101,3 +101,32 @@ app.post('/complaints', async (req, res) => {
     });
   }
 });
+
+
+
+// GET /complaints - Retrieve all complaints
+app.get('/complaints', async (req, res) => {
+  try {
+    const query = `
+      SELECT *
+      FROM complaints
+      ORDER BY created_at DESC
+    `;
+
+    const result = await pool.query(query);
+    
+    res.status(200).json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows
+    });
+    
+  } catch (error) {
+    console.error('Error fetching complaints:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: 'Failed to fetch complaints'
+    });
+  }
+});
