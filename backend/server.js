@@ -130,3 +130,53 @@ app.get('/complaints', async (req, res) => {
     });
   }
 });
+
+
+
+// update the complaint status
+app.patch('/complaints/:id', async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+    const { status } = req.body
+
+    if(!status || !['Pending', 'Resolved'].includes(status)){
+      return res,status(400).json({
+        error: 'Invalid status: Must be "Pending" or "Resolved"'
+      });
+    }
+
+    const query = `
+      UPDATE complaints
+      SET status= $1
+      WHERE id = $2
+      RETURNING *
+   `; 
+
+
+    const result = await pool.query(query, [status, id])
+
+    if(result.rows.length === 0){
+      return res.status(404).json({
+        success: false,
+        error: 'Complaint not found'
+      });
+    }
+
+    res.status(200).json({
+      success:true,
+      message: 'Complaint updated successfully',
+      data: result.rows[0]
+    });
+  } catch (error){
+
+    console.error('Error updating complaint: ', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: 'Failed to update complaint'
+    });
+  }
+
+});
