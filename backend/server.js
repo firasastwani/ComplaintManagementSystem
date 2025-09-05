@@ -39,8 +39,65 @@ app.listen(PORT, () => {
 });
 
 
+// Helper function for input validation
 const validateComplaintInput = (data) => {
-
+  const errors = [];
   
+  if (!data.name || data.name.trim().length === 0) {
+    errors.push('Name is required');
+  }
+  
+  if (!data.email || !/\S+@\S+\.\S+/.test(data.email)) {
+    errors.push('Valid email is required');
+  }
+  
+  if (!data.complaint || data.complaint.trim().length === 0) {
+    errors.push('Complaint message is required');
+  }
+  
+  return errors;
+};
 
-}
+// POST /complaints - Create a new complaint
+app.post('/complaints', async (req, res) => {
+
+  try {
+    const { name, email, complaint } = req.body;
+
+    // Validate the input
+    const validationErrors = validateComplaintInput(req.body);
+
+    if (validationErrors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Validation failed',
+        details: validationErrors
+      });
+    }
+
+    // Insert into the database
+    const query = `
+      INSERT INTO complaints (name, email, complaint, status, created_at) 
+      VALUES ($1, $2, $3, $4, NOW()) 
+      RETURNING *
+    `;
+    
+    const values = [name.trim(), email.trim(), complaint.trim(), 'Pending'];
+    
+    const result = await pool.query(query, values);
+
+    res.status(201).json({
+      success: true,
+      message: 'Complaint submitted successfully',
+      data: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Error creating complaint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: 'Failed to submit complaint'
+    });
+  }
+});
