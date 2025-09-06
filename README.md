@@ -24,7 +24,7 @@
 
 Before you begin, ensure you have the following installed:
 
-- [Node.js](https://nodejs.org/) (v16 or higher)
+- [Node.js](https://nodejs.org/) 
 - [Docker](https://www.docker.com/) (for PostgreSQL)
 
 ### 1. Clone the Repository
@@ -75,11 +75,7 @@ CREATE TABLE complaints (
 2. **Start the backend server:**
 
    ```bash
-   # Development mode (with auto-restart)
    npm run dev
-
-   # Production mode
-   npm start
    ```
 
    The backend will run on `http://localhost:3001`
