@@ -215,6 +215,6 @@ app.delete('/complaints/:id', async (req, res) => {
       error: 'Internal server error',
       message: 'Failed to delete complaint'
     });
-    
+
   }
 });
